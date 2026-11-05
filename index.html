@@ -1,87 +1,258 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Global Groundwater Study Locations</title>
+  <title>Groundwater Systematic Review | Interactive Study Map</title>
 
+  <!-- Leaflet CSS -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   >
 
   <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       background: #ffffff;
-    }
-
-    header {
-      padding: 18px 24px;
-      text-align: center;
-      background: #ffffff;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 23px;
       color: #263746;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
-    .subtitle {
-      margin-top: 7px;
-      color: #65717c;
-      font-size: 14px;
+    /* =========================================
+       ACADEMIC MANUSCRIPT HEADER
+    ========================================= */
+
+    .paper-header {
+      background: #ffffff;
+      text-align: center;
+      padding: 24px 40px 20px;
+      border-bottom: 1px solid #dce3e8;
     }
+
+    .paper-header h1 {
+      max-width: 1200px;
+      margin: 0 auto 14px;
+      font-size: clamp(20px, 2vw, 29px);
+      font-weight: 700;
+      line-height: 1.3;
+      color: #233746;
+    }
+
+    .authors {
+      font-size: 16px;
+      font-weight: 600;
+      color: #263746;
+      margin-bottom: 12px;
+    }
+
+    .affiliations {
+      max-width: 1100px;
+      margin: 0 auto;
+      font-size: 12px;
+      color: #536474;
+      line-height: 1.45;
+    }
+
+    .affiliations p {
+      margin: 3px 0;
+    }
+
+    .correspondence {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #536474;
+    }
+
+    .correspondence a {
+      color: #176b9a;
+      text-decoration: none;
+    }
+
+    .correspondence a:hover {
+      text-decoration: underline;
+    }
+
+    /* =========================================
+       MAP
+    ========================================= */
 
     #map {
-      height: calc(100vh - 105px);
+      flex: 1;
       width: 100%;
+      min-height: 480px;
+      height: 65vh;
+      background: #eaf2f5;
     }
 
+    /* =========================================
+       STUDY POPUPS
+    ========================================= */
+
     .leaflet-popup-content {
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 13px;
       line-height: 1.6;
-      max-width: 300px;
+      max-width: 320px;
+      min-width: 220px;
+    }
+
+    .paper-id {
+      font-size: 14px;
+      font-weight: 700;
+      color: #28628b;
+      margin-bottom: 7px;
     }
 
     .paper-title {
-      font-weight: bold;
+      font-size: 13px;
+      font-weight: 600;
+      color: #263746;
       margin: 8px 0;
     }
 
-    a {
+    .doi-link {
       color: #176b9a;
       overflow-wrap: anywhere;
+      text-decoration: none;
     }
+
+    .doi-link:hover {
+      text-decoration: underline;
+    }
+
+    /* =========================================
+       RESPONSIVE DESIGN
+    ========================================= */
+
+    @media (max-width: 768px) {
+
+      .paper-header {
+        padding: 18px 14px;
+      }
+
+      .paper-header h1 {
+        font-size: 20px;
+      }
+
+      .authors {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .affiliations {
+        font-size: 11px;
+      }
+
+      .correspondence {
+        font-size: 11px;
+      }
+
+      #map {
+        min-height: 450px;
+        height: 65vh;
+      }
+    }
+
   </style>
 </head>
 
 <body>
 
-  <header>
-    <h1>Global Distribution of Reviewed Groundwater Studies</h1>
-    <div class="subtitle">
-      Satellite-based groundwater monitoring and estimation
+  <!-- =======================================
+       MANUSCRIPT HEADER
+  ======================================== -->
+
+  <header class="paper-header">
+
+    <h1>
+      Systematic Review on the Use of Remote Sensing Techniques
+      in Groundwater Monitoring and Estimation across
+      Hydroclimatic Regions
+    </h1>
+
+    <div class="authors">
+      Sadeepa Karunarathna<sup>a</sup>,
+      Khaled Alghafli<sup>a,*</sup>,
+      Chamal Perera<sup>b,c</sup>
     </div>
+
+    <div class="affiliations">
+
+      <p>
+        <sup>a</sup>
+        Department of Civil and Environmental Engineering,
+        Faculty of Engineering,
+        United Arab Emirates University,
+        Al Ain, P.O. Box 15551,
+        United Arab Emirates
+      </p>
+
+      <p>
+        <sup>b</sup>
+        Department of Civil Engineering,
+        University of Moratuwa,
+        Moratuwa 10400,
+        Sri Lanka
+      </p>
+
+      <p>
+        <sup>c</sup>
+        UNESCO-Madanjeet Singh Centre for South Asia
+        Water Management (UMCSAWM),
+        University of Moratuwa,
+        Moratuwa 10400,
+        Sri Lanka
+      </p>
+
+    </div>
+
+    <div class="correspondence">
+      * Corresponding author:
+      <a href="mailto:khaledalghafli@uaeu.ac.ae">
+        khaledalghafli@uaeu.ac.ae
+      </a>
+    </div>
+
   </header>
+
+  <!-- =======================================
+       INTERACTIVE MAP
+  ======================================== -->
 
   <div id="map"></div>
 
+  <!-- Leaflet JavaScript -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // Create the world map
+
+    /* =======================================
+       INITIALIZE MAP
+    ======================================== */
+
     const map = L.map("map", {
       center: [20, 10],
       zoom: 2,
-      minZoom: 2
+      minZoom: 2,
+      zoomControl: true
     });
 
-    // Add background map
+    /* =======================================
+       OPENSTREETMAP BASEMAP
+    ======================================== */
+
     L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
@@ -90,7 +261,10 @@
       }
     ).addTo(map);
 
-    // Prevent unsafe HTML in spreadsheet-derived fields
+    /* =======================================
+       ESCAPE HTML FOR SAFE POPUPS
+    ======================================== */
+
     function escapeHTML(value) {
       return String(value ?? "").replace(
         /[&<>"']/g,
@@ -104,84 +278,165 @@
       );
     }
 
-    // Load study locations from GeoJSON
+    /* =======================================
+       DOI LINK HANDLING
+    ======================================== */
+
+    function createDOILink(value) {
+
+      const rawDOI = String(value || "").trim();
+
+      if (!rawDOI) {
+        return "Not available";
+      }
+
+      const doi = rawDOI.replace(
+        /^https?:\/\/(dx\.)?doi\.org\//i,
+        ""
+      );
+
+      const doiURL =
+        "https://doi.org/" + encodeURI(doi);
+
+      return (
+        '<a class="doi-link" href="' +
+        escapeHTML(doiURL) +
+        '" target="_blank" rel="noopener noreferrer">' +
+        escapeHTML(doi) +
+        "</a>"
+      );
+    }
+
+    /* =======================================
+       LOAD STUDY LOCATIONS
+    ======================================== */
+
     fetch("./groundwater_studies.geojson")
+
       .then(response => {
+
         if (!response.ok) {
-          throw new Error("Could not load GeoJSON");
+          throw new Error(
+            "Unable to load groundwater_studies.geojson"
+          );
         }
+
         return response.json();
+
       })
+
       .then(data => {
 
-        let mapped = 0;
+        let mappedStudies = 0;
 
-        const layer = L.geoJSON(data, {
+        const studyLayer = L.geoJSON(data, {
+
+          /* Exclude missing or invalid geometries */
+
           filter: feature => {
-            const g = feature.geometry;
-            return g &&
-              g.type === "Point" &&
-              Array.isArray(g.coordinates) &&
-              g.coordinates.length >= 2 &&
-              g.coordinates.slice(0, 2).every(Number.isFinite) &&
-              Math.abs(g.coordinates[0]) <= 180 &&
-              Math.abs(g.coordinates[1]) <= 90;
+
+            const geometry = feature.geometry;
+
+            return (
+              geometry &&
+              geometry.type === "Point" &&
+              Array.isArray(geometry.coordinates) &&
+              geometry.coordinates.length >= 2 &&
+              geometry.coordinates.slice(0, 2)
+                .every(Number.isFinite) &&
+              Math.abs(geometry.coordinates[0]) <= 180 &&
+              Math.abs(geometry.coordinates[1]) <= 90
+            );
+
           },
+
+          /* Marker appearance */
 
           pointToLayer: (feature, latlng) => {
+
             return L.circleMarker(latlng, {
-              radius: 5,
+              radius: 5.5,
               color: "#ffffff",
-              weight: 1,
+              weight: 1.5,
               fillColor: "#28628B",
-              fillOpacity: 0.85
+              fillOpacity: 0.9
             });
+
           },
 
+          /* Popup information */
+
           onEachFeature: (feature, marker) => {
-            mapped++;
 
-            const p = feature.properties || {};
+            mappedStudies++;
 
-            const id = escapeHTML(p.Paper_ID || "Not available");
-            const title = escapeHTML(p.Article_Title || "Not available");
+            const properties = feature.properties || {};
 
-            const rawDOI = String(p.DOI_Link || "").trim();
-            const doi = rawDOI.replace(
-              /^https?:\/\/(dx\.)?doi\.org\//i, ""
+            const paperID = escapeHTML(
+              properties.Paper_ID || "Not available"
             );
 
-            const doiURL = doi
-              ? "https://doi.org/" + encodeURI(doi)
-              : "";
-
-            const doiHTML = doiURL
-              ? '<a href="' + escapeHTML(doiURL) +
-                '" target="_blank" rel="noopener noreferrer">' +
-                escapeHTML(doi) + '</a>'
-              : "Not available";
-
-            marker.bindPopup(
-              "<strong>Paper ID:</strong> " + id +
-              '<div class="paper-title">' + title + "</div>" +
-              "<strong>DOI:</strong> " + doiHTML
+            const articleTitle = escapeHTML(
+              properties.Article_Title || "Not available"
             );
+
+            const doiHTML = createDOILink(
+              properties.DOI_Link
+            );
+
+            const popupHTML = `
+              <div class="paper-id">
+                ${paperID}
+              </div>
+
+              <div class="paper-title">
+                ${articleTitle}
+              </div>
+
+              <div>
+                <strong>DOI:</strong>
+                ${doiHTML}
+              </div>
+            `;
+
+            marker.bindPopup(popupHTML);
+
           }
+
         }).addTo(map);
 
-        if (layer.getLayers().length > 0) {
-          map.fitBounds(layer.getBounds(), {
+        /* Fit map to study distribution */
+
+        if (studyLayer.getLayers().length > 0) {
+
+          map.fitBounds(studyLayer.getBounds(), {
             padding: [30, 30],
             maxZoom: 5
           });
+
         }
 
-        console.log("Mapped study locations:", mapped);
+        console.log(
+          "Mapped groundwater studies:",
+          mappedStudies
+        );
+
       })
+
       .catch(error => {
-        console.error("Map data loading error:", error);
-        alert("The study data could not be loaded. Check the GeoJSON filename.");
+
+        console.error(
+          "Error loading study locations:",
+          error
+        );
+
+        alert(
+          "Study locations could not be loaded. " +
+          "Please check the GeoJSON filename and location."
+        );
+
       });
+
   </script>
 
 </body>
