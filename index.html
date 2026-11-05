@@ -1,42 +1,46 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Groundwater Systematic Review | Study Location Atlas</title>
+<title>Groundwater Systematic Review | Interactive Evidence Map</title>
 
 <link rel="stylesheet"
  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   font-family: Arial, Helvetica, sans-serif;
   color: #263746;
-  background: #fff;
+  background: #ffffff;
 }
 
-/* Compact academic header */
+/* Academic header */
 
 .paper-header {
-  padding: 12px 24px 10px;
+  padding: 10px 20px 9px;
   text-align: center;
-  background: #fff;
+  background: #ffffff;
   border-bottom: 1px solid #dce3e8;
 }
 
 .paper-header h1 {
-  max-width: 1250px;
-  margin: 0 auto 7px;
+  max-width: 1400px;
+  margin: 0 auto 6px;
   font-size: clamp(16px, 1.45vw, 21px);
   line-height: 1.28;
   font-weight: 700;
+  color: #243746;
 }
 
 .authors {
@@ -46,11 +50,11 @@ html, body {
 }
 
 .affiliations {
-  max-width: 1300px;
+  max-width: 1350px;
   margin: auto;
   font-size: 10.5px;
   line-height: 1.35;
-  color: #62717d;
+  color: #61717d;
 }
 
 .affiliations p {
@@ -60,51 +64,45 @@ html, body {
 .correspondence {
   margin-top: 4px;
   font-size: 10.5px;
-  color: #62717d;
+  color: #61717d;
 }
 
-.correspondence a,
-.legend-panel a {
+a {
   color: #176b9a;
-  text-decoration: none;
 }
 
-.correspondence a:hover,
-.legend-panel a:hover {
-  text-decoration: underline;
-}
-
-/* Main layout: prioritise the map */
+/* Main layout */
 
 .webgis-layout {
   display: grid;
-  grid-template-columns: minmax(0, 82fr) minmax(210px, 18fr);
+  grid-template-columns: minmax(0, 82fr) minmax(215px, 18fr);
   gap: 8px;
   padding: 8px;
-  height: calc(100vh - 125px);
-  min-height: 560px;
+  height: calc(100vh - 120px);
+  min-height: 540px;
 }
 
 .map-panel {
   min-width: 0;
   min-height: 0;
-  border: 1px solid #dce3e8;
   overflow: hidden;
-  background: #edf3f6;
+  border: 1px solid #dce3e8;
+  background: #f2f6f8;
 }
 
 #map {
-  height: 100%;
   width: 100%;
+  height: 100%;
+  background: #f2f6f8;
 }
 
-/* Right-side scientific panel */
+/* Right sidebar */
 
 .legend-panel {
   min-width: 0;
   overflow-y: auto;
-  padding: 13px 12px;
-  background: #fff;
+  padding: 14px 12px;
+  background: #ffffff;
   border: 1px solid #dce3e8;
 }
 
@@ -115,12 +113,12 @@ html, body {
 
 .legend-panel h3 {
   font-size: 12px;
-  margin: 15px 0 8px;
+  margin: 16px 0 8px;
 }
 
 .legend-panel p {
   font-size: 11px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: #5d6b76;
 }
 
@@ -129,26 +127,27 @@ html, body {
   margin: 14px 0;
 }
 
-.layer-item {
-  padding: 7px 8px;
-  margin-bottom: 5px;
-  border: 1px solid #e3e8ec;
-  background: #fafbfc;
+/* Background selector */
+
+.layer-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 7px 5px;
   font-size: 11px;
-  line-height: 1.4;
+  cursor: pointer;
 }
 
-.layer-note {
-  font-size: 10px;
-  color: #77848e;
-  margin-top: 7px;
+.layer-option input {
+  margin: 1px 0 0;
+  accent-color: #28628b;
 }
 
 .legend-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 7px 0;
+  margin: 6px 0;
   font-size: 11px;
 }
 
@@ -159,7 +158,25 @@ html, body {
   flex-shrink: 0;
 }
 
-/* Study marker popup */
+.beck-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px 3px;
+}
+
+.beck-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.beck-item .swatch {
+  width: 11px;
+  height: 11px;
+}
+
+/* Study popup */
 
 .leaflet-popup-content {
   font-size: 12px;
@@ -182,6 +199,21 @@ html, body {
 .doi-link {
   color: #176b9a;
   overflow-wrap: anywhere;
+}
+
+/* Map status */
+
+.map-status {
+  position: absolute;
+  bottom: 24px;
+  left: 12px;
+  z-index: 800;
+  background: rgba(255,255,255,0.95);
+  padding: 6px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.15);
+  pointer-events: none;
 }
 
 /* Responsive layout */
@@ -236,10 +268,12 @@ html, body {
       Faculty of Engineering, United Arab Emirates University,
       Al Ain, P.O. Box 15551, United Arab Emirates
     </p>
+
     <p>
       <sup>b</sup> Department of Civil Engineering,
       University of Moratuwa, Moratuwa 10400, Sri Lanka
     </p>
+
     <p>
       <sup>c</sup> UNESCO-Madanjeet Singh Centre for South Asia
       Water Management (UMCSAWM),
@@ -260,7 +294,9 @@ html, body {
 
   <section class="map-panel"
     aria-label="Interactive groundwater study map">
+
     <div id="map"></div>
+
   </section>
 
   <aside class="legend-panel">
@@ -269,55 +305,84 @@ html, body {
 
     <h3>Background maps</h3>
 
-    <div class="layer-item">
+    <label class="layer-option">
+      <input type="radio" name="background"
+             value="country" checked>
       Country basemap
-    </div>
+    </label>
 
-    <div class="layer-item">
+    <label class="layer-option">
+      <input type="radio" name="background"
+             value="beck">
       Original Köppen–Geiger (30 classes)
-    </div>
+    </label>
 
-    <div class="layer-item">
+    <label class="layer-option">
+      <input type="radio" name="background"
+             value="review">
       Review hydroclimatic groups (6 classes)
-    </div>
-
-    <div class="layer-note">
-      Climate background layers will be enabled
-      in the next development step.
-    </div>
+    </label>
 
     <div class="divider"></div>
 
-    <h3>Six hydroclimatic groups</h3>
-
-    <div class="legend-row">
-      <span class="swatch" style="background:#D98983"></span>
-      Arid
+    <div id="countryLegend">
+      <h3>Country basemap</h3>
+      <p>
+        Country boundaries provide geographical context
+        for the reviewed groundwater studies.
+      </p>
     </div>
 
-    <div class="legend-row">
-      <span class="swatch" style="background:#E9BB7C"></span>
-      Semi-arid
+    <div id="beckLegend" style="display:none">
+
+      <h3>Original Köppen–Geiger classification</h3>
+
+      <p>Beck et al. (2023) — 30 climate subclasses</p>
+
+      <div class="beck-grid" id="beckLegendItems"></div>
+
     </div>
 
-    <div class="legend-row">
-      <span class="swatch" style="background:#83BE98"></span>
-      Tropical rainforest/savanna
-    </div>
+    <div id="reviewLegend" style="display:none">
 
-    <div class="legend-row">
-      <span class="swatch" style="background:#72B8C7"></span>
-      Tropical monsoon
-    </div>
+      <h3>Six hydroclimatic groups</h3>
 
-    <div class="legend-row">
-      <span class="swatch" style="background:#D7D79A"></span>
-      Temperate
-    </div>
+      <div class="legend-row">
+        <span class="swatch" style="background:#D98983"></span>
+        Arid
+      </div>
 
-    <div class="legend-row">
-      <span class="swatch" style="background:#9EAFCE"></span>
-      Cold/polar
+      <div class="legend-row">
+        <span class="swatch" style="background:#E9BB7C"></span>
+        Semi-arid
+      </div>
+
+      <div class="legend-row">
+        <span class="swatch" style="background:#83BE98"></span>
+        Tropical rainforest/savanna
+      </div>
+
+      <div class="legend-row">
+        <span class="swatch" style="background:#72B8C7"></span>
+        Tropical monsoon
+      </div>
+
+      <div class="legend-row">
+        <span class="swatch" style="background:#D7D79A"></span>
+        Temperate
+      </div>
+
+      <div class="legend-row">
+        <span class="swatch" style="background:#9EAFCE"></span>
+        Cold/polar
+      </div>
+
+      <p>
+        These six operational review groups were
+        aggregated from the original Köppen–Geiger
+        climate subclasses.
+      </p>
+
     </div>
 
     <div class="divider"></div>
@@ -325,30 +390,32 @@ html, body {
     <h3>Reviewed study locations</h3>
 
     <p>
-      Click a study marker to view its Paper ID,
+      Click a marker to view the Paper ID,
       article title and DOI.
-      Markers indicate representative study locations,
-      not necessarily the full study-area extent.
+    </p>
+
+    <p>
+      Markers represent approximate study-area
+      locations and not necessarily the full
+      geographical extent of each study.
     </p>
 
     <div class="divider"></div>
 
-    <h3>Climate data</h3>
+    <h3>Climate data source</h3>
 
     <p>
       Beck et al. (2023).
       High-resolution (1 km) Köppen–Geiger maps
-      for 1901–2099 based on constrained CMIP6 projections.
-      <em>Scientific Data</em>, 10, 724.
-      <a href="https://doi.org/10.1038/s41597-023-02549-6"
-         target="_blank" rel="noopener noreferrer">
-        DOI
-      </a>
+      for 1901–2099 based on constrained CMIP6
+      projections. <em>Scientific Data</em>, 10, 724.
     </p>
 
     <p>
-      Six review groups are derived from the original
-      Köppen–Geiger climate subclasses.
+      <a href="https://doi.org/10.1038/s41597-023-02549-6"
+         target="_blank" rel="noopener noreferrer">
+        View original climate dataset publication
+      </a>
     </p>
 
   </aside>
@@ -359,26 +426,171 @@ html, body {
 
 <script>
 
-/* Initialise interactive map */
+/* ==========================================
+   INITIALISE MAP IN GEOGRAPHIC COORDINATES
+========================================== */
 
 const map = L.map("map", {
-  center: [20, 10],
-  zoom: 2,
-  minZoom: 2,
-  zoomControl: true
+  crs: L.CRS.EPSG4326,
+  center: [15, 0],
+  zoom: 1,
+  minZoom: 0,
+  maxZoom: 7,
+  zoomControl: true,
+  worldCopyJump: false
 });
 
-/* Country basemap */
+/* ==========================================
+   MAP PANES AND DRAWING ORDER
+========================================== */
 
-L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+map.createPane("backgroundPane");
+map.getPane("backgroundPane").style.zIndex = 200;
+
+map.createPane("climatePane");
+map.getPane("climatePane").style.zIndex = 300;
+
+map.createPane("countryPane");
+map.getPane("countryPane").style.zIndex = 350;
+
+map.createPane("studyPane");
+map.getPane("studyPane").style.zIndex = 450;
+
+/* ==========================================
+   GLOBAL CLIMATE IMAGE BOUNDS
+========================================== */
+
+const climateBounds = [
+  [-90, -180],
+  [90, 180]
+];
+
+/* ==========================================
+   BACKGROUND LAYERS
+========================================== */
+
+const beckLayer = L.imageOverlay(
+  "./beck_30_classes.png",
+  climateBounds,
   {
-    attribution: "&copy; OpenStreetMap contributors",
-    maxZoom: 18
+    pane: "climatePane",
+    opacity: 1,
+    interactive: false
   }
-).addTo(map);
+);
 
-/* Escape HTML */
+const reviewLayer = L.imageOverlay(
+  "./review_6_classes.png",
+  climateBounds,
+  {
+    pane: "climatePane",
+    opacity: 1,
+    interactive: false
+  }
+);
+
+/* Country boundary layer */
+
+const countryBasemap = L.layerGroup();
+
+fetch(
+  "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson"
+)
+.then(response => {
+  if (!response.ok) {
+    throw new Error("Country boundary data unavailable");
+  }
+  return response.json();
+})
+.then(data => {
+  L.geoJSON(data, {
+    pane: "countryPane",
+    style: {
+      color: "#a8b7c2",
+      weight: 0.65,
+      fillColor: "#f1f3f5",
+      fillOpacity: 1
+    }
+  }).addTo(countryBasemap);
+})
+.catch(error => {
+  console.warn("Country boundaries could not be loaded:", error);
+});
+
+/* Initial background */
+
+countryBasemap.addTo(map);
+
+/* ==========================================
+   SWITCH BACKGROUND LAYERS
+========================================== */
+
+function switchBackground(type) {
+
+  map.removeLayer(countryBasemap);
+  map.removeLayer(beckLayer);
+  map.removeLayer(reviewLayer);
+
+  if (type === "beck") {
+    beckLayer.addTo(map);
+  } else if (type === "review") {
+    reviewLayer.addTo(map);
+  } else {
+    countryBasemap.addTo(map);
+  }
+
+  document.getElementById("countryLegend").style.display =
+    type === "country" ? "block" : "none";
+
+  document.getElementById("beckLegend").style.display =
+    type === "beck" ? "block" : "none";
+
+  document.getElementById("reviewLegend").style.display =
+    type === "review" ? "block" : "none";
+}
+
+document.querySelectorAll(
+  'input[name="background"]'
+).forEach(input => {
+  input.addEventListener("change", event => {
+    switchBackground(event.target.value);
+  });
+});
+
+/* ==========================================
+   ORIGINAL BECK 30-CLASS LEGEND
+========================================== */
+
+const beckClasses = [
+  ["Af", "#0000FF"], ["Am", "#0078FF"],
+  ["Aw", "#46AAFA"], ["BWh", "#FF0000"],
+  ["BWk", "#FF9696"], ["BSh", "#F5A500"],
+  ["BSk", "#FFDC64"], ["Csa", "#FFFF00"],
+  ["Csb", "#C8C800"], ["Csc", "#969600"],
+  ["Cwa", "#96FF96"], ["Cwb", "#64C864"],
+  ["Cwc", "#329632"], ["Cfa", "#C8FF50"],
+  ["Cfb", "#64FF50"], ["Cfc", "#32C800"],
+  ["Dsa", "#FF00FF"], ["Dsb", "#C800C8"],
+  ["Dsc", "#963296"], ["Dsd", "#966496"],
+  ["Dwa", "#AAAFFF"], ["Dwb", "#5A78DC"],
+  ["Dwc", "#4B50B4"], ["Dwd", "#320087"],
+  ["Dfa", "#00FFFF"], ["Dfb", "#37C8FF"],
+  ["Dfc", "#007D7D"], ["Dfd", "#00465F"],
+  ["ET", "#B2B2B2"], ["EF", "#666666"]
+];
+
+document.getElementById("beckLegendItems").innerHTML =
+  beckClasses.map(([name, color]) => `
+    <div class="beck-item">
+      <span class="swatch"
+        style="background:${color}"></span>
+      ${name}
+    </div>
+  `).join("");
+
+/* ==========================================
+   SAFE HTML HANDLING
+========================================== */
 
 function escapeHTML(value) {
   return String(value ?? "").replace(
@@ -393,15 +605,21 @@ function escapeHTML(value) {
   );
 }
 
-/* Build DOI link */
+/* ==========================================
+   DOI LINK
+========================================== */
 
 function createDOILink(value) {
+
   const raw = String(value || "").trim();
 
-  if (!raw) return "Not available";
+  if (!raw) {
+    return "Not available";
+  }
 
   const doi = raw.replace(
-    /^https?:\/\/(dx\.)?doi\.org\//i, ""
+    /^https?:\/\/(dx\.)?doi\.org\//i,
+    ""
   );
 
   if (!/^10\.\d{4,9}\/\S+$/i.test(doi)) {
@@ -419,75 +637,88 @@ function createDOILink(value) {
   );
 }
 
-/* Load study GeoJSON */
+/* ==========================================
+   LOAD GROUNDWATER STUDY LOCATIONS
+========================================== */
 
 fetch("./groundwater_studies.geojson")
-  .then(response => {
-    if (!response.ok) {
-      throw new Error("Could not load GeoJSON");
-    }
-    return response.json();
-  })
-  .then(data => {
+.then(response => {
+  if (!response.ok) {
+    throw new Error("Unable to load groundwater_studies.geojson");
+  }
+  return response.json();
+})
+.then(data => {
 
-    const studyLayer = L.geoJSON(data, {
+  const studyLayer = L.geoJSON(data, {
 
-      filter: feature => {
-        const g = feature.geometry;
-        return (
-          g &&
-          g.type === "Point" &&
-          Array.isArray(g.coordinates) &&
-          g.coordinates.length >= 2 &&
-          g.coordinates.slice(0,2).every(Number.isFinite) &&
-          Math.abs(g.coordinates[0]) <= 180 &&
-          Math.abs(g.coordinates[1]) <= 90
-        );
-      },
+    pane: "studyPane",
 
-      pointToLayer: (feature, latlng) =>
-        L.circleMarker(latlng, {
-          radius: 5,
-          color: "#ffffff",
-          weight: 1.2,
-          fillColor: "#28628B",
-          fillOpacity: 0.9
-        }),
+    filter: feature => {
+      const g = feature.geometry;
 
-      onEachFeature: (feature, marker) => {
+      return (
+        g &&
+        g.type === "Point" &&
+        Array.isArray(g.coordinates) &&
+        g.coordinates.length >= 2 &&
+        g.coordinates.slice(0, 2).every(Number.isFinite) &&
+        Math.abs(g.coordinates[0]) <= 180 &&
+        Math.abs(g.coordinates[1]) <= 90
+      );
+    },
 
-        const p = feature.properties || {};
+    pointToLayer: (feature, latlng) =>
+      L.circleMarker(latlng, {
+        pane: "studyPane",
+        radius: 5,
+        color: "#263746",
+        weight: 1.2,
+        fillColor: "#ffffff",
+        fillOpacity: 0.95
+      }),
 
-        const id = escapeHTML(
-          p.ID || "Not available"
-        );
+    onEachFeature: (feature, marker) => {
 
-        const title = escapeHTML(
-          p.Article_Title || "Not available"
-        );
+      const p = feature.properties || {};
 
-        const doi = createDOILink(p.DOI_Link);
+      const id = escapeHTML(
+        p.Paper_ID || "Not available"
+      );
 
-        marker.bindPopup(`
-          <div class="paper-id">${id}</div>
-          <div class="paper-title">${title}</div>
-          <div><strong>DOI:</strong> ${doi}</div>
-        `);
-      }
-    }).addTo(map);
+      const title = escapeHTML(
+        p.Article_Title || "Not available"
+      );
 
-    if (studyLayer.getLayers().length > 0) {
-      map.fitBounds(studyLayer.getBounds(), {
-        padding: [30, 30],
-        maxZoom: 5
-      });
+      const doi = createDOILink(p.DOI_Link);
+
+      marker.bindPopup(`
+        <div class="paper-id">${id}</div>
+        <div class="paper-title">${title}</div>
+        <div>
+          <strong>DOI:</strong> ${doi}
+        </div>
+      `);
     }
 
-  })
-  .catch(error => {
-    console.error(error);
-    alert("Unable to load the study-location GeoJSON.");
-  });
+  }).addTo(map);
+
+  if (studyLayer.getLayers().length > 0) {
+    map.fitBounds(studyLayer.getBounds(), {
+      padding: [30, 30],
+      maxZoom: 4
+    });
+  }
+
+})
+.catch(error => {
+  console.error("Study data loading error:", error);
+  alert("Unable to load groundwater study locations.");
+});
+
+/* Initial legend */
+
+switchBackground("country");
 
 </script>
 
