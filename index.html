@@ -1,443 +1,495 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Groundwater Systematic Review | Interactive Study Map</title>
+<title>Groundwater Systematic Review | Study Location Atlas</title>
 
-  <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  >
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-  <style>
+<style>
+* { box-sizing: border-box; }
 
-    * {
-      box-sizing: border-box;
-    }
+html, body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #263746;
+  background: #fff;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #ffffff;
-      color: #263746;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+/* Compact academic header */
 
-    /* =========================================
-       ACADEMIC MANUSCRIPT HEADER
-    ========================================= */
+.paper-header {
+  padding: 12px 24px 10px;
+  text-align: center;
+  background: #fff;
+  border-bottom: 1px solid #dce3e8;
+}
 
-    .paper-header {
-      background: #ffffff;
-      text-align: center;
-      padding: 24px 40px 20px;
-      border-bottom: 1px solid #dce3e8;
-    }
+.paper-header h1 {
+  max-width: 1250px;
+  margin: 0 auto 7px;
+  font-size: clamp(16px, 1.45vw, 21px);
+  line-height: 1.28;
+  font-weight: 700;
+}
 
-    .paper-header h1 {
-      max-width: 1200px;
-      margin: 0 auto 14px;
-      font-size: clamp(20px, 2vw, 29px);
-      font-weight: 700;
-      line-height: 1.3;
-      color: #233746;
-    }
+.authors {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
 
-    .authors {
-      font-size: 16px;
-      font-weight: 600;
-      color: #263746;
-      margin-bottom: 12px;
-    }
+.affiliations {
+  max-width: 1300px;
+  margin: auto;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: #62717d;
+}
 
-    .affiliations {
-      max-width: 1100px;
-      margin: 0 auto;
-      font-size: 12px;
-      color: #536474;
-      line-height: 1.45;
-    }
+.affiliations p {
+  margin: 2px 0;
+}
 
-    .affiliations p {
-      margin: 3px 0;
-    }
+.correspondence {
+  margin-top: 4px;
+  font-size: 10.5px;
+  color: #62717d;
+}
 
-    .correspondence {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #536474;
-    }
+.correspondence a,
+.legend-panel a {
+  color: #176b9a;
+  text-decoration: none;
+}
 
-    .correspondence a {
-      color: #176b9a;
-      text-decoration: none;
-    }
+.correspondence a:hover,
+.legend-panel a:hover {
+  text-decoration: underline;
+}
 
-    .correspondence a:hover {
-      text-decoration: underline;
-    }
+/* Main layout: prioritise the map */
 
-    /* =========================================
-       MAP
-    ========================================= */
+.webgis-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 82fr) minmax(210px, 18fr);
+  gap: 8px;
+  padding: 8px;
+  height: calc(100vh - 125px);
+  min-height: 560px;
+}
 
-    #map {
-      flex: 1;
-      width: 100%;
-      min-height: 480px;
-      height: 65vh;
-      background: #eaf2f5;
-    }
+.map-panel {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #dce3e8;
+  overflow: hidden;
+  background: #edf3f6;
+}
 
-    /* =========================================
-       STUDY POPUPS
-    ========================================= */
+#map {
+  height: 100%;
+  width: 100%;
+}
 
-    .leaflet-popup-content {
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 13px;
-      line-height: 1.6;
-      max-width: 320px;
-      min-width: 220px;
-    }
+/* Right-side scientific panel */
 
-    .paper-id {
-      font-size: 14px;
-      font-weight: 700;
-      color: #28628b;
-      margin-bottom: 7px;
-    }
+.legend-panel {
+  min-width: 0;
+  overflow-y: auto;
+  padding: 13px 12px;
+  background: #fff;
+  border: 1px solid #dce3e8;
+}
 
-    .paper-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #263746;
-      margin: 8px 0;
-    }
+.legend-panel h2 {
+  font-size: 14px;
+  margin: 0 0 12px;
+}
 
-    .doi-link {
-      color: #176b9a;
-      overflow-wrap: anywhere;
-      text-decoration: none;
-    }
+.legend-panel h3 {
+  font-size: 12px;
+  margin: 15px 0 8px;
+}
 
-    .doi-link:hover {
-      text-decoration: underline;
-    }
+.legend-panel p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #5d6b76;
+}
 
-    /* =========================================
-       RESPONSIVE DESIGN
-    ========================================= */
+.divider {
+  border-top: 1px solid #e4e9ee;
+  margin: 14px 0;
+}
 
-    @media (max-width: 768px) {
+.layer-item {
+  padding: 7px 8px;
+  margin-bottom: 5px;
+  border: 1px solid #e3e8ec;
+  background: #fafbfc;
+  font-size: 11px;
+  line-height: 1.4;
+}
 
-      .paper-header {
-        padding: 18px 14px;
-      }
+.layer-note {
+  font-size: 10px;
+  color: #77848e;
+  margin-top: 7px;
+}
 
-      .paper-header h1 {
-        font-size: 20px;
-      }
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 7px 0;
+  font-size: 11px;
+}
 
-      .authors {
-        font-size: 14px;
-        line-height: 1.6;
-      }
+.swatch {
+  width: 15px;
+  height: 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
 
-      .affiliations {
-        font-size: 11px;
-      }
+/* Study marker popup */
 
-      .correspondence {
-        font-size: 11px;
-      }
+.leaflet-popup-content {
+  font-size: 12px;
+  line-height: 1.55;
+  min-width: 210px;
+  max-width: 310px;
+}
 
-      #map {
-        min-height: 450px;
-        height: 65vh;
-      }
-    }
+.paper-id {
+  color: #28628b;
+  font-size: 13px;
+  font-weight: 700;
+}
 
-  </style>
+.paper-title {
+  font-weight: 600;
+  margin: 7px 0;
+}
+
+.doi-link {
+  color: #176b9a;
+  overflow-wrap: anywhere;
+}
+
+/* Responsive layout */
+
+@media (max-width: 850px) {
+  .paper-header {
+    padding: 12px;
+  }
+
+  .paper-header h1 {
+    font-size: 17px;
+  }
+
+  .webgis-layout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+  }
+
+  .map-panel {
+    height: 65vh;
+    min-height: 420px;
+  }
+
+  .legend-panel {
+    overflow: visible;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- =======================================
-       MANUSCRIPT HEADER
-  ======================================== -->
+<header class="paper-header">
 
-  <header class="paper-header">
+  <h1>
+    Systematic Review on the Use of Remote Sensing Techniques
+    in Groundwater Monitoring and Estimation across
+    Hydroclimatic Regions
+  </h1>
 
-    <h1>
-      Systematic Review on the Use of Remote Sensing Techniques
-      in Groundwater Monitoring and Estimation across
-      Hydroclimatic Regions
-    </h1>
+  <div class="authors">
+    Sadeepa Karunarathna<sup>a</sup>,
+    Khaled Alghafli<sup>a,*</sup>,
+    Chamal Perera<sup>b,c</sup>
+  </div>
 
-    <div class="authors">
-      Sadeepa Karunarathna<sup>a</sup>,
-      Khaled Alghafli<sup>a,*</sup>,
-      Chamal Perera<sup>b,c</sup>
+  <div class="affiliations">
+    <p>
+      <sup>a</sup> Department of Civil and Environmental Engineering,
+      Faculty of Engineering, United Arab Emirates University,
+      Al Ain, P.O. Box 15551, United Arab Emirates
+    </p>
+    <p>
+      <sup>b</sup> Department of Civil Engineering,
+      University of Moratuwa, Moratuwa 10400, Sri Lanka
+    </p>
+    <p>
+      <sup>c</sup> UNESCO-Madanjeet Singh Centre for South Asia
+      Water Management (UMCSAWM),
+      University of Moratuwa, Moratuwa 10400, Sri Lanka
+    </p>
+  </div>
+
+  <div class="correspondence">
+    * Corresponding author:
+    <a href="mailto:khaledalghafli@uaeu.ac.ae">
+      khaledalghafli@uaeu.ac.ae
+    </a>
+  </div>
+
+</header>
+
+<main class="webgis-layout">
+
+  <section class="map-panel"
+    aria-label="Interactive groundwater study map">
+    <div id="map"></div>
+  </section>
+
+  <aside class="legend-panel">
+
+    <h2>Map information</h2>
+
+    <h3>Background maps</h3>
+
+    <div class="layer-item">
+      Country basemap
     </div>
 
-    <div class="affiliations">
-
-      <p>
-        <sup>a</sup>
-        Department of Civil and Environmental Engineering,
-        Faculty of Engineering,
-        United Arab Emirates University,
-        Al Ain, P.O. Box 15551,
-        United Arab Emirates
-      </p>
-
-      <p>
-        <sup>b</sup>
-        Department of Civil Engineering,
-        University of Moratuwa,
-        Moratuwa 10400,
-        Sri Lanka
-      </p>
-
-      <p>
-        <sup>c</sup>
-        UNESCO-Madanjeet Singh Centre for South Asia
-        Water Management (UMCSAWM),
-        University of Moratuwa,
-        Moratuwa 10400,
-        Sri Lanka
-      </p>
-
+    <div class="layer-item">
+      Original Köppen–Geiger (30 classes)
     </div>
 
-    <div class="correspondence">
-      * Corresponding author:
-      <a href="mailto:khaledalghafli@uaeu.ac.ae">
-        khaledalghafli@uaeu.ac.ae
+    <div class="layer-item">
+      Review hydroclimatic groups (6 classes)
+    </div>
+
+    <div class="layer-note">
+      Climate background layers will be enabled
+      in the next development step.
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Six hydroclimatic groups</h3>
+
+    <div class="legend-row">
+      <span class="swatch" style="background:#D98983"></span>
+      Arid
+    </div>
+
+    <div class="legend-row">
+      <span class="swatch" style="background:#E9BB7C"></span>
+      Semi-arid
+    </div>
+
+    <div class="legend-row">
+      <span class="swatch" style="background:#83BE98"></span>
+      Tropical rainforest/savanna
+    </div>
+
+    <div class="legend-row">
+      <span class="swatch" style="background:#72B8C7"></span>
+      Tropical monsoon
+    </div>
+
+    <div class="legend-row">
+      <span class="swatch" style="background:#D7D79A"></span>
+      Temperate
+    </div>
+
+    <div class="legend-row">
+      <span class="swatch" style="background:#9EAFCE"></span>
+      Cold/polar
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Reviewed study locations</h3>
+
+    <p>
+      Click a study marker to view its Paper ID,
+      article title and DOI.
+      Markers indicate representative study locations,
+      not necessarily the full study-area extent.
+    </p>
+
+    <div class="divider"></div>
+
+    <h3>Climate data</h3>
+
+    <p>
+      Beck et al. (2023).
+      High-resolution (1 km) Köppen–Geiger maps
+      for 1901–2099 based on constrained CMIP6 projections.
+      <em>Scientific Data</em>, 10, 724.
+      <a href="https://doi.org/10.1038/s41597-023-02549-6"
+         target="_blank" rel="noopener noreferrer">
+        DOI
       </a>
-    </div>
+    </p>
 
-  </header>
+    <p>
+      Six review groups are derived from the original
+      Köppen–Geiger climate subclasses.
+    </p>
 
-  <!-- =======================================
-       INTERACTIVE MAP
-  ======================================== -->
+  </aside>
 
-  <div id="map"></div>
+</main>
 
-  <!-- Leaflet JavaScript -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script>
+<script>
 
-    /* =======================================
-       INITIALIZE MAP
-    ======================================== */
+/* Initialise interactive map */
 
-    const map = L.map("map", {
-      center: [20, 10],
-      zoom: 2,
-      minZoom: 2,
-      zoomControl: true
-    });
+const map = L.map("map", {
+  center: [20, 10],
+  zoom: 2,
+  minZoom: 2,
+  zoomControl: true
+});
 
-    /* =======================================
-       OPENSTREETMAP BASEMAP
-    ======================================== */
+/* Country basemap */
 
-    L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 18
-      }
-    ).addTo(map);
+L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    attribution: "&copy; OpenStreetMap contributors",
+    maxZoom: 18
+  }
+).addTo(map);
 
-    /* =======================================
-       ESCAPE HTML FOR SAFE POPUPS
-    ======================================== */
+/* Escape HTML */
 
-    function escapeHTML(value) {
-      return String(value ?? "").replace(
-        /[&<>"']/g,
-        char => ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        }[char])
-      );
+function escapeHTML(value) {
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char])
+  );
+}
+
+/* Build DOI link */
+
+function createDOILink(value) {
+  const raw = String(value || "").trim();
+
+  if (!raw) return "Not available";
+
+  const doi = raw.replace(
+    /^https?:\/\/(dx\.)?doi\.org\//i, ""
+  );
+
+  if (!/^10\.\d{4,9}\/\S+$/i.test(doi)) {
+    return escapeHTML(raw);
+  }
+
+  const url = "https://doi.org/" + encodeURI(doi);
+
+  return (
+    '<a class="doi-link" href="' +
+    escapeHTML(url) +
+    '" target="_blank" rel="noopener noreferrer">' +
+    escapeHTML(doi) +
+    "</a>"
+  );
+}
+
+/* Load study GeoJSON */
+
+fetch("./groundwater_studies.geojson")
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Could not load GeoJSON");
     }
+    return response.json();
+  })
+  .then(data => {
 
-    /* =======================================
-       DOI LINK HANDLING
-    ======================================== */
+    const studyLayer = L.geoJSON(data, {
 
-    function createDOILink(value) {
+      filter: feature => {
+        const g = feature.geometry;
+        return (
+          g &&
+          g.type === "Point" &&
+          Array.isArray(g.coordinates) &&
+          g.coordinates.length >= 2 &&
+          g.coordinates.slice(0,2).every(Number.isFinite) &&
+          Math.abs(g.coordinates[0]) <= 180 &&
+          Math.abs(g.coordinates[1]) <= 90
+        );
+      },
 
-      const rawDOI = String(value || "").trim();
+      pointToLayer: (feature, latlng) =>
+        L.circleMarker(latlng, {
+          radius: 5,
+          color: "#ffffff",
+          weight: 1.2,
+          fillColor: "#28628B",
+          fillOpacity: 0.9
+        }),
 
-      if (!rawDOI) {
-        return "Not available";
+      onEachFeature: (feature, marker) => {
+
+        const p = feature.properties || {};
+
+        const id = escapeHTML(
+          p.Paper_ID || "Not available"
+        );
+
+        const title = escapeHTML(
+          p.Article_Title || "Not available"
+        );
+
+        const doi = createDOILink(p.DOI_Link);
+
+        marker.bindPopup(`
+          <div class="paper-id">${id}</div>
+          <div class="paper-title">${title}</div>
+          <div><strong>DOI:</strong> ${doi}</div>
+        `);
       }
+    }).addTo(map);
 
-      const doi = rawDOI.replace(
-        /^https?:\/\/(dx\.)?doi\.org\//i,
-        ""
-      );
-
-      const doiURL =
-        "https://doi.org/" + encodeURI(doi);
-
-      return (
-        '<a class="doi-link" href="' +
-        escapeHTML(doiURL) +
-        '" target="_blank" rel="noopener noreferrer">' +
-        escapeHTML(doi) +
-        "</a>"
-      );
-    }
-
-    /* =======================================
-       LOAD STUDY LOCATIONS
-    ======================================== */
-
-    fetch("./groundwater_studies.geojson")
-
-      .then(response => {
-
-        if (!response.ok) {
-          throw new Error(
-            "Unable to load groundwater_studies.geojson"
-          );
-        }
-
-        return response.json();
-
-      })
-
-      .then(data => {
-
-        let mappedStudies = 0;
-
-        const studyLayer = L.geoJSON(data, {
-
-          /* Exclude missing or invalid geometries */
-
-          filter: feature => {
-
-            const geometry = feature.geometry;
-
-            return (
-              geometry &&
-              geometry.type === "Point" &&
-              Array.isArray(geometry.coordinates) &&
-              geometry.coordinates.length >= 2 &&
-              geometry.coordinates.slice(0, 2)
-                .every(Number.isFinite) &&
-              Math.abs(geometry.coordinates[0]) <= 180 &&
-              Math.abs(geometry.coordinates[1]) <= 90
-            );
-
-          },
-
-          /* Marker appearance */
-
-          pointToLayer: (feature, latlng) => {
-
-            return L.circleMarker(latlng, {
-              radius: 5.5,
-              color: "#ffffff",
-              weight: 1.5,
-              fillColor: "#28628B",
-              fillOpacity: 0.9
-            });
-
-          },
-
-          /* Popup information */
-
-          onEachFeature: (feature, marker) => {
-
-            mappedStudies++;
-
-            const properties = feature.properties || {};
-
-            const paperID = escapeHTML(
-              properties.Paper_ID || "Not available"
-            );
-
-            const articleTitle = escapeHTML(
-              properties.Article_Title || "Not available"
-            );
-
-            const doiHTML = createDOILink(
-              properties.DOI_Link
-            );
-
-            const popupHTML = `
-              <div class="paper-id">
-                ${paperID}
-              </div>
-
-              <div class="paper-title">
-                ${articleTitle}
-              </div>
-
-              <div>
-                <strong>DOI:</strong>
-                ${doiHTML}
-              </div>
-            `;
-
-            marker.bindPopup(popupHTML);
-
-          }
-
-        }).addTo(map);
-
-        /* Fit map to study distribution */
-
-        if (studyLayer.getLayers().length > 0) {
-
-          map.fitBounds(studyLayer.getBounds(), {
-            padding: [30, 30],
-            maxZoom: 5
-          });
-
-        }
-
-        console.log(
-          "Mapped groundwater studies:",
-          mappedStudies
-        );
-
-      })
-
-      .catch(error => {
-
-        console.error(
-          "Error loading study locations:",
-          error
-        );
-
-        alert(
-          "Study locations could not be loaded. " +
-          "Please check the GeoJSON filename and location."
-        );
-
+    if (studyLayer.getLayers().length > 0) {
+      map.fitBounds(studyLayer.getBounds(), {
+        padding: [30, 30],
+        maxZoom: 5
       });
+    }
 
-  </script>
+  })
+  .catch(error => {
+    console.error(error);
+    alert("Unable to load the study-location GeoJSON.");
+  });
+
+</script>
 
 </body>
 </html>
