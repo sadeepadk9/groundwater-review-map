@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Global Groundwater Study Locations</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  >
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+    }
+
+    header {
+      padding: 18px 24px;
+      text-align: center;
+      background: #ffffff;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 23px;
+      color: #263746;
+    }
+
+    .subtitle {
+      margin-top: 7px;
+      color: #65717c;
+      font-size: 14px;
+    }
+
+    #map {
+      height: calc(100vh - 105px);
+      width: 100%;
+    }
+
+    .leaflet-popup-content {
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 300px;
+    }
+
+    .paper-title {
+      font-weight: bold;
+      margin: 8px 0;
+    }
+
+    a {
+      color: #176b9a;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Global Distribution of Reviewed Groundwater Studies</h1>
+    <div class="subtitle">
+      Satellite-based groundwater monitoring and estimation
+    </div>
+  </header>
+
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // Create the world map
+    const map = L.map("map", {
+      center: [20, 10],
+      zoom: 2,
+      minZoom: 2
+    });
+
+    // Add background map
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 18
+      }
+    ).addTo(map);
+
+    // Prevent unsafe HTML in spreadsheet-derived fields
+    function escapeHTML(value) {
+      return String(value ?? "").replace(
+        /[&<>"']/g,
+        char => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char])
+      );
+    }
+
+    // Load study locations from GeoJSON
+    fetch("./groundwater_studies.geojson")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Could not load GeoJSON");
+        }
+        return response.json();
+      })
+      .then(data => {
+
+        let mapped = 0;
+
+        const layer = L.geoJSON(data, {
+          filter: feature => {
+            const g = feature.geometry;
+            return g &&
+              g.type === "Point" &&
+              Array.isArray(g.coordinates) &&
+              g.coordinates.length >= 2 &&
+              g.coordinates.slice(0, 2).every(Number.isFinite) &&
+              Math.abs(g.coordinates[0]) <= 180 &&
+              Math.abs(g.coordinates[1]) <= 90;
+          },
+
+          pointToLayer: (feature, latlng) => {
+            return L.circleMarker(latlng, {
+              radius: 5,
+              color: "#ffffff",
+              weight: 1,
+              fillColor: "#28628B",
+              fillOpacity: 0.85
+            });
+          },
+
+          onEachFeature: (feature, marker) => {
+            mapped++;
+
+            const p = feature.properties || {};
+
+            const id = escapeHTML(p.Paper_ID || "Not available");
+            const title = escapeHTML(p.Article_Title || "Not available");
+
+            const rawDOI = String(p.DOI_Link || "").trim();
+            const doi = rawDOI.replace(
+              /^https?:\/\/(dx\.)?doi\.org\//i, ""
+            );
+
+            const doiURL = doi
+              ? "https://doi.org/" + encodeURI(doi)
+              : "";
+
+            const doiHTML = doiURL
+              ? '<a href="' + escapeHTML(doiURL) +
+                '" target="_blank" rel="noopener noreferrer">' +
+                escapeHTML(doi) + '</a>'
+              : "Not available";
+
+            marker.bindPopup(
+              "<strong>Paper ID:</strong> " + id +
+              '<div class="paper-title">' + title + "</div>" +
+              "<strong>DOI:</strong> " + doiHTML
+            );
+          }
+        }).addTo(map);
+
+        if (layer.getLayers().length > 0) {
+          map.fitBounds(layer.getBounds(), {
+            padding: [30, 30],
+            maxZoom: 5
+          });
+        }
+
+        console.log("Mapped study locations:", mapped);
+      })
+      .catch(error => {
+        console.error("Map data loading error:", error);
+        alert("The study data could not be loaded. Check the GeoJSON filename.");
+      });
+  </script>
+
+</body>
+</html>
