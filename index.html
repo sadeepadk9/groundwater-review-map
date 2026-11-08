@@ -11,7 +11,9 @@
  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
@@ -22,7 +24,9 @@ html, body {
   background: #ffffff;
 }
 
-/* Compact manuscript header */
+/* ==========================================
+   COMPACT ACADEMIC HEADER
+========================================== */
 
 .paper-header {
   padding: 9px 18px 8px;
@@ -52,7 +56,9 @@ html, body {
   color: #60717d;
 }
 
-.affiliations p { margin: 2px 0; }
+.affiliations p {
+  margin: 2px 0;
+}
 
 .correspondence {
   margin-top: 4px;
@@ -60,9 +66,13 @@ html, body {
   color: #60717d;
 }
 
-a { color: #176b9a; }
+a {
+  color: #176b9a;
+}
 
-/* Main map layout */
+/* ==========================================
+   MAP-FIRST TWO-COLUMN LAYOUT
+========================================== */
 
 .webgis-layout {
   display: grid;
@@ -84,17 +94,19 @@ a { color: #176b9a; }
 #map {
   width: 100%;
   height: 100%;
-  background: #f2f6f8;
+  background: #DCECF3;
 }
 
-/* Right scientific panel */
+/* ==========================================
+   RIGHT SCIENTIFIC SIDEBAR
+========================================== */
 
 .legend-panel {
   min-width: 0;
   overflow-y: auto;
   padding: 13px 12px;
   border: 1px solid #dce3e8;
-  background: white;
+  background: #ffffff;
 }
 
 .legend-panel h2 {
@@ -132,6 +144,10 @@ a { color: #176b9a; }
   accent-color: #28628b;
 }
 
+/* ==========================================
+   CLIMATE LEGENDS
+========================================== */
+
 .legend-row {
   display: flex;
   align-items: center;
@@ -165,7 +181,9 @@ a { color: #176b9a; }
   height: 11px;
 }
 
-/* Publication popups */
+/* ==========================================
+   STUDY INFORMATION POPUPS
+========================================== */
 
 .leaflet-popup-content {
   font-size: 12px;
@@ -208,7 +226,13 @@ a { color: #176b9a; }
   text-decoration: none;
 }
 
-.doi-link:hover { text-decoration: underline; }
+.doi-link:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================
+   MAP STATUS
+========================================== */
 
 .map-status {
   position: absolute;
@@ -223,9 +247,19 @@ a { color: #176b9a; }
   pointer-events: none;
 }
 
+/* ==========================================
+   RESPONSIVE DESIGN
+========================================== */
+
 @media (max-width: 850px) {
-  .paper-header { padding: 10px; }
-  .paper-header h1 { font-size: 17px; }
+
+  .paper-header {
+    padding: 10px;
+  }
+
+  .paper-header h1 {
+    font-size: 17px;
+  }
 
   .webgis-layout {
     display: flex;
@@ -239,14 +273,21 @@ a { color: #176b9a; }
     min-height: 420px;
   }
 
-  .legend-panel { overflow: visible; }
+  .legend-panel {
+    overflow: visible;
+  }
 }
 </style>
 </head>
 
 <body>
 
+<!-- ==========================================
+     MANUSCRIPT HEADER
+========================================== -->
+
 <header class="paper-header">
+
   <h1>
     Systematic Review on the Use of Remote Sensing Techniques
     in Groundwater Monitoring and Estimation across
@@ -260,20 +301,24 @@ a { color: #176b9a; }
   </div>
 
   <div class="affiliations">
+
     <p>
       <sup>a</sup> Department of Civil and Environmental Engineering,
       Faculty of Engineering, United Arab Emirates University,
       Al Ain, P.O. Box 15551, United Arab Emirates
     </p>
+
     <p>
       <sup>b</sup> Department of Civil Engineering,
       University of Moratuwa, Moratuwa 10400, Sri Lanka
     </p>
+
     <p>
       <sup>c</sup> UNESCO-Madanjeet Singh Centre for South Asia
       Water Management (UMCSAWM), University of Moratuwa,
       Moratuwa 10400, Sri Lanka
     </p>
+
   </div>
 
   <div class="correspondence">
@@ -282,16 +327,24 @@ a { color: #176b9a; }
       khaledalghafli@uaeu.ac.ae
     </a>
   </div>
+
 </header>
+
+<!-- ==========================================
+     MAIN WEBGIS LAYOUT
+========================================== -->
 
 <main class="webgis-layout">
 
   <section class="map-panel"
     aria-label="Interactive groundwater study map">
+
     <div id="map"></div>
+
     <div class="map-status" id="mapStatus">
       Loading study locations...
     </div>
+
   </section>
 
   <aside class="legend-panel">
@@ -318,57 +371,64 @@ a { color: #176b9a; }
 
     <div class="divider"></div>
 
+    <!-- Country legend -->
+
     <div id="countryLegend">
+
       <h3>Country basemap</h3>
+
       <p>
         Country boundaries provide geographical context
         for the reviewed groundwater studies.
       </p>
+
     </div>
 
+    <!-- Original Beck legend -->
+
     <div id="beckLegend" style="display:none">
+
       <h3>Original Köppen–Geiger classification</h3>
+
       <p>Beck et al. (2023) — 30 climate subclasses</p>
+
       <div class="beck-grid" id="beckLegendItems"></div>
+
     </div>
+
+    <!-- Six-group legend -->
 
     <div id="reviewLegend" style="display:none">
 
       <h3>Six hydroclimatic groups</h3>
 
       <div class="legend-row">
-        <span class="swatch"
-          style="background:#B71C1C"></span>
+        <span class="swatch" style="background:#B71C1C"></span>
         Arid
       </div>
 
       <div class="legend-row">
-        <span class="swatch"
-          style="background:#F4A340"></span>
+        <span class="swatch" style="background:#F4A340"></span>
         Semi-arid
       </div>
 
       <div class="legend-row">
-        <span class="swatch"
-          style="background:#319C43"></span>
+        <span class="swatch" style="background:#319C43"></span>
         Tropical rainforest/savanna
       </div>
 
       <div class="legend-row">
-        <span class="swatch"
-          style="background:#20A9CF"></span>
+        <span class="swatch" style="background:#20A9CF"></span>
         Tropical monsoon
       </div>
 
       <div class="legend-row">
-        <span class="swatch"
-          style="background:#E8D943"></span>
+        <span class="swatch" style="background:#E8D943"></span>
         Temperate
       </div>
 
       <div class="legend-row">
-        <span class="swatch"
-          style="background:#2C4E71"></span>
+        <span class="swatch" style="background:#2C4E71"></span>
         Cold/polar
       </div>
 
@@ -376,6 +436,7 @@ a { color: #176b9a; }
         The six operational review groups were aggregated
         from the original Köppen–Geiger subclasses.
       </p>
+
     </div>
 
     <div class="divider"></div>
@@ -412,13 +473,20 @@ a { color: #176b9a; }
     </p>
 
   </aside>
+
 </main>
+
+<!-- ==========================================
+     LEAFLET JAVASCRIPT
+========================================== -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-/* Geographic-coordinate map */
+/* ==========================================
+   INITIALISE GEOGRAPHIC MAP
+========================================== */
 
 const map = L.map("map", {
   crs: L.CRS.EPSG4326,
@@ -430,7 +498,9 @@ const map = L.map("map", {
   worldCopyJump: false
 });
 
-/* Drawing order */
+/* ==========================================
+   MAP PANES AND DRAWING ORDER
+========================================== */
 
 map.createPane("climatePane");
 map.getPane("climatePane").style.zIndex = 300;
@@ -441,7 +511,9 @@ map.getPane("countryPane").style.zIndex = 350;
 map.createPane("studyPane");
 map.getPane("studyPane").style.zIndex = 450;
 
-/* Climate images */
+/* ==========================================
+   CLIMATE IMAGE LAYERS
+========================================== */
 
 const climateBounds = [
   [-90, -180],
@@ -468,43 +540,70 @@ const reviewLayer = L.imageOverlay(
   }
 );
 
-/* Country basemap */
+/* ==========================================
+   COUNTRY BASEMAP - SCIENTIFIC STYLE
+========================================== */
 
 const countryBasemap = L.layerGroup();
 
+// Set initial ocean background
+map.getContainer().style.backgroundColor = "#DCECF3";
+
+// Load country boundaries
 fetch(
   "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson"
 )
 .then(response => {
+
   if (!response.ok) {
     throw new Error("Country boundaries unavailable");
   }
+
   return response.json();
+
 })
 .then(data => {
+
   L.geoJSON(data, {
+
     pane: "countryPane",
+
     style: {
-      color: "#a8b7c2",
-      weight: 0.65,
-      fillColor: "#f1f3f5",
+      color: "#A5B2BB",
+      weight: 0.7,
+      opacity: 0.85,
+      fillColor: "#F2F1EC",
       fillOpacity: 1
-    }
+    },
+
+    interactive: false
+
   }).addTo(countryBasemap);
+
 })
 .catch(error => {
   console.warn("Country boundary loading error:", error);
 });
 
+// Display country basemap initially
 countryBasemap.addTo(map);
 
-/* Background switching */
+/* ==========================================
+   SWITCH BACKGROUND LAYERS
+========================================== */
 
 function switchBackground(type) {
+
+  // Set appropriate background colour
+  map.getContainer().style.backgroundColor =
+    type === "country" ? "#DCECF3" : "#FFFFFF";
+
+  // Remove previous background
   map.removeLayer(countryBasemap);
   map.removeLayer(beckLayer);
   map.removeLayer(reviewLayer);
 
+  // Activate selected background
   if (type === "beck") {
     beckLayer.addTo(map);
   } else if (type === "review") {
@@ -513,6 +612,7 @@ function switchBackground(type) {
     countryBasemap.addTo(map);
   }
 
+  // Update scientific legend
   document.getElementById("countryLegend").style.display =
     type === "country" ? "block" : "none";
 
@@ -523,15 +623,20 @@ function switchBackground(type) {
     type === "review" ? "block" : "none";
 }
 
+// Listen for layer selection
 document.querySelectorAll(
   'input[name="background"]'
 ).forEach(input => {
+
   input.addEventListener("change", event => {
     switchBackground(event.target.value);
   });
+
 });
 
-/* Original Beck climate legend */
+/* ==========================================
+   ORIGINAL BECK 30-CLASS LEGEND
+========================================== */
 
 const beckClasses = [
   ["Af","#0000FF"], ["Am","#0078FF"],
@@ -560,7 +665,9 @@ document.getElementById("beckLegendItems").innerHTML =
     </div>
   `).join("");
 
-/* Safe text for popups */
+/* ==========================================
+   SAFE HTML HANDLING
+========================================== */
 
 function escapeHTML(value) {
   return String(value ?? "").replace(
@@ -575,29 +682,44 @@ function escapeHTML(value) {
   );
 }
 
-/* Read field using alternative column names */
+/* ==========================================
+   READ GEOJSON FIELDS
+========================================== */
 
 function getField(properties, fieldNames) {
+
   for (const name of fieldNames) {
+
     const value = properties[name];
-    if (value !== undefined &&
-        value !== null &&
-        String(value).trim() !== "") {
+
+    if (
+      value !== undefined &&
+      value !== null &&
+      String(value).trim() !== ""
+    ) {
       return String(value).trim();
     }
+
   }
+
   return "";
 }
 
-/* DOI hyperlink */
+/* ==========================================
+   DOI HYPERLINK
+========================================== */
 
 function createDOILink(value) {
+
   const raw = String(value || "").trim();
 
-  if (!raw) return "Not available";
+  if (!raw) {
+    return "Not available";
+  }
 
   const doi = raw.replace(
-    /^https?:\/\/(dx\.)?doi\.org\//i, ""
+    /^https?:\/\/(dx\.)?doi\.org\//i,
+    ""
   );
 
   if (!/^10\.\d{4,9}\/\S+$/i.test(doi)) {
@@ -615,20 +737,28 @@ function createDOILink(value) {
   );
 }
 
-/* Load study records */
+/* ==========================================
+   LOAD GROUNDWATER STUDY LOCATIONS
+========================================== */
 
 fetch("./groundwater_studies.geojson")
+
 .then(response => {
+
   if (!response.ok) {
     throw new Error("Unable to load study GeoJSON");
   }
+
   return response.json();
+
 })
+
 .then(data => {
 
   const studyLayer = L.geoJSON(data, {
 
     filter: feature => {
+
       const g = feature.geometry;
 
       return (
@@ -640,6 +770,7 @@ fetch("./groundwater_studies.geojson")
         Math.abs(g.coordinates[0]) <= 180 &&
         Math.abs(g.coordinates[1]) <= 90
       );
+
     },
 
     pointToLayer: (feature, latlng) =>
@@ -679,24 +810,29 @@ fetch("./groundwater_studies.geojson")
 
       const popupHTML = `
         <table class="popup-table">
+
           <tr>
             <th>Paper ID</th>
             <td class="popup-id">
               ${escapeHTML(paperID)}
             </td>
           </tr>
+
           <tr>
             <th>Title</th>
             <td>${escapeHTML(articleTitle)}</td>
           </tr>
+
           <tr>
             <th>DOI</th>
             <td>${createDOILink(doiValue)}</td>
           </tr>
+
         </table>
       `;
 
       marker.bindPopup(popupHTML);
+
     }
 
   }).addTo(map);
@@ -712,17 +848,25 @@ fetch("./groundwater_studies.geojson")
       maxZoom: 4
     });
   }
+
 })
+
 .catch(error => {
+
   console.error(error);
+
   document.getElementById("mapStatus").textContent =
     "Unable to load study data";
+
 });
 
-/* Initialise background */
+/* ==========================================
+   INITIALISE COUNTRY BASEMAP
+========================================== */
 
 switchBackground("country");
 
 </script>
+
 </body>
 </html>
