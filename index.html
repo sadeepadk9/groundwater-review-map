@@ -840,7 +840,7 @@ fetch("./groundwater_studies.geojson")
   const count = studyLayer.getLayers().length;
 
   document.getElementById("mapStatus").textContent =
-    153 + " mapped study locations";
+    143 + " mapped study locations";
 
   if (count > 0) {
     map.fitBounds(studyLayer.getBounds(), {
